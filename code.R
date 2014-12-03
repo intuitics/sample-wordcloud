@@ -6,6 +6,19 @@ books <- list("A Mid Summer Night's Dream" = "summer",
               "The Merchant of Venice" = "merchant",
               "Romeo and Juliet" = "romeo")
 
+download.file.https2 <- function(httpsurl, destfile=NULL){
+  data <- getURLContent(httpsurl, followlocation=T, binary=T, ssl.verifypeer = FALSE)
+  if(is.null(destfile)){
+    destfile = tempfile("downloaded")
+  }
+  to.write = file(destfile, "wb")
+
+  writeBin(as.raw(data), to.write)
+}
+
+download.file.https2("https://github.com/rstudio/shiny-examples/blob/master/082-word-cloud/merchant.txt.gz?raw=true", "merchant.txt.gz")
+download.file.https2("https://github.com/rstudio/shiny-examples/blob/master/082-word-cloud/romeo.txt.gz?raw=true", "romeo.txt.gz")
+download.file.https2("https://github.com/rstudio/shiny-examples/blob/master/082-word-cloud/summer.txt.gz?raw=true", "summer.txt.gz")
 
 books.func <- function(){ 
    names(books)
@@ -39,32 +52,9 @@ getTermMatrix <- function(book) {
   sort(rowSums(m), decreasing = TRUE)
 }
 
-getMatrix <- function(selection){
-  getTermMatrix(selection)
-}
-
-download.file.https2 <- function(httpsurl, destfile=NULL){
-  library(RCurl)
-  data <- getURLContent(httpsurl, followlocation=T, binary=T, ssl.verifypeer = FALSE)
-  if(is.null(destfile)){
-    destfile = tempfile("downloaded")
-  }
-  to.write = file(destfile, "wb")
-
-  writeBin(as.raw(data), to.write)
-}
-
-download.file.https2("https://github.com/rstudio/shiny-examples/blob/master/082-word-cloud/merchant.txt.gz?raw=true", "merchant.txt.gz")
-download.file.https2("https://github.com/rstudio/shiny-examples/blob/master/082-word-cloud/romeo.txt.gz?raw=true", "romeo.txt.gz")
-download.file.https2("https://github.com/rstudio/shiny-examples/blob/master/082-word-cloud/summer.txt.gz?raw=true", "summer.txt.gz")
-
-updater <- function(selection){
-    getTermMatrix(selection)
-}
-
 outputplot <- function(freq, max, book){
   v <- getTermMatrix(book)
   wordcloud(names(v), v, scale=c(4,0.5),
                 min.freq = freq, max.words=max,
                 colors=brewer.pal(8, "Dark2"))
-  }
+}
