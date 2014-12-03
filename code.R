@@ -53,8 +53,7 @@ getTermMatrix <- function(book) {
 }
 
 outputplot <- function(freq, max, book){
-  v <- getTermMatrix(book)
-  wordcloud(names(v), v, scale=c(4,0.5),
+  wordcloud(names(matrix), matrix, scale=c(4,0.5),
                 min.freq = freq, max.words=max,
                 colors=brewer.pal(8, "Dark2"))
 }
