@@ -1,4 +1,4 @@
-# Do not forget to let the following libraries in the Dependency R packages section:
+# Do not forget to set the following libraries in the Dependency R packages section:
 #   tm
 #   wordcloud
 #   RCurl
