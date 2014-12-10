@@ -1,6 +1,7 @@
-library(tm)
-library(wordcloud)
-library(RCurl)
+# Do not forget to let the following libraries in the Dependency R packages section:
+#   tm
+#   wordcloud
+#   RCurl
 
 books <- list("A Mid Summer Night's Dream" = "summer",
               "The Merchant of Venice" = "merchant",
