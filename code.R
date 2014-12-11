@@ -15,6 +15,9 @@ download.file.https2 <- function(httpsurl, destfile=NULL){
   to.write = file(destfile, "wb")
 
   writeBin(as.raw(data), to.write)
+  
+  # return the saved file
+  destfile
 }
 
 download.file.https2("https://github.com/rstudio/shiny-examples/blob/master/082-word-cloud/merchant.txt.gz?raw=true", "merchant.txt.gz")
