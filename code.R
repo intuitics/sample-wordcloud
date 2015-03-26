@@ -1,63 +1,57 @@
-# Do not forget to set the following libraries in the Dependency R packages section:
+# Do not forget to add the following libraries in the "Dependency R packages" section:
 #   tm
 #   wordcloud
 #   RCurl
 
+# Utility function to download a file
+download.to.file <- function(httpsurl, destfile) {
+  data <- getURLContent(httpsurl, followlocation = T, binary = T, ssl.verifypeer = F)
+  file.connection <- file(destfile, "wb")
+  writeBin(as.raw(data), file.connection)
+  close(file.connection)
+}
+
+# Download the text of the three works
+download.to.file("https://github.com/intuitics/sample-wordcloud/blob/master/merchant.txt.gz?raw=true", "merchant.txt.gz")
+download.to.file("https://github.com/intuitics/sample-wordcloud/blob/master/romeo.txt.gz?raw=true", "romeo.txt.gz")
+download.to.file("https://github.com/intuitics/sample-wordcloud/blob/master/summer.txt.gz?raw=true", "summer.txt.gz")
+
+# Map the name of each work to its file
 books <- list("A Mid Summer Night's Dream" = "summer",
               "The Merchant of Venice" = "merchant",
               "Romeo and Juliet" = "romeo")
 
-download.file.https2 <- function(httpsurl, destfile=NULL){
-  data <- getURLContent(httpsurl, followlocation=T, binary=T, ssl.verifypeer = FALSE)
-  if(is.null(destfile)){
-    destfile = tempfile("downloaded")
-  }
-  to.write = file(destfile, "wb")
+# Return the names to show in the drop-down list
+get.book.names <- function(){ 
+  names(books)
+}
 
-  writeBin(as.raw(data), to.write)
+# Draw the word cloud
+draw.plot <- function(book, min.freq, max.words) {
+  # Get the filename from the selected book title
+  filename <- books[[book]]
   
-  # return the saved file
-  destfile
-}
-
-download.file.https2("https://github.com/rstudio/shiny-examples/blob/master/082-word-cloud/merchant.txt.gz?raw=true", "merchant.txt.gz")
-download.file.https2("https://github.com/rstudio/shiny-examples/blob/master/082-word-cloud/romeo.txt.gz?raw=true", "romeo.txt.gz")
-download.file.https2("https://github.com/rstudio/shiny-examples/blob/master/082-word-cloud/summer.txt.gz?raw=true", "summer.txt.gz")
-
-books.func <- function(){ 
-   names(books)
-}
-
-books.mapper <- function(x) {
- list("A Mid Summer Night's Dream" = "summer",
-              "The Merchant of Venice" = "merchant",
-              "Romeo and Juliet" = "romeo")[[x]]
-}
-
-getTermMatrix <- function(book) {
-  if (!(book %in% books))
-    stop("Unknown book")
-
-  text <- readLines(sprintf("./%s.txt.gz", book),
-    encoding="UTF-8")
-
-  myCorpus = Corpus(VectorSource(text))
-  myCorpus = tm_map(myCorpus, content_transformer(tolower))
-  myCorpus = tm_map(myCorpus, removePunctuation)
-  myCorpus = tm_map(myCorpus, removeNumbers)
-  myCorpus = tm_map(myCorpus, removeWords,
-         c(stopwords("SMART"), "thy", "thou", "thee", "the", "and", "but"))
-
-  myDTM = TermDocumentMatrix(myCorpus,
-              control = list(minWordLength = 1))
+  # Read the compressed file containing the text for the selected book
+  text <- readLines(sprintf("./%s.txt.gz", filename), encoding="UTF-8")
   
-  m = as.matrix(myDTM)
+  # Clear the text by converting it to lower case, removing punctuation, numbers, and commonly used words
+  corpus = Corpus(VectorSource(text))
+  corpus = tm_map(corpus, content_transformer(tolower))
+  corpus = tm_map(corpus, removePunctuation)
+  corpus = tm_map(corpus, removeNumbers)
+  corpus = tm_map(corpus, removeWords, c(stopwords("SMART"), "thy", "thou", "thee", "the", "and", "but"))
   
-  sort(rowSums(m), decreasing = TRUE)
+  # Convert the result into an integer vector listing each word's frequenty (the words are in the names attribute)
+  tdm = TermDocumentMatrix(corpus, control = list(minWordLength = 1))
+  word.freq = sort(rowSums(as.matrix(tdm)), decreasing = TRUE)
+  
+  # Draw the word cloud
+  wordcloud(names(word.freq), word.freq, scale = c(4,0.5),
+            min.freq = min.freq, max.words = max.words,
+            colors = brewer.pal(8, "Dark2"))
 }
 
-outputplot <- function(freq, max, book){
-  wordcloud(names(matrix), matrix, scale=c(4,0.5),
-                min.freq = freq, max.words=max,
-                colors=brewer.pal(8, "Dark2"))
-}
+# Set default for application start
+book <- "A Mid Summer Night's Dream"
+min.freq <- 20
+max.words <- 20
