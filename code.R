@@ -12,9 +12,9 @@ download.to.file <- function(httpsurl, destfile) {
 }
 
 # Download the text of the three works
-download.to.file("https://github.com/intuitics/sample-wordcloud/blob/master/merchant.txt.gz?raw=true", "merchant.txt.gz")
-download.to.file("https://github.com/intuitics/sample-wordcloud/blob/master/romeo.txt.gz?raw=true", "romeo.txt.gz")
-download.to.file("https://github.com/intuitics/sample-wordcloud/blob/master/summer.txt.gz?raw=true", "summer.txt.gz")
+download.to.file("https://s3-eu-west-1.amazonaws.com/intuitics-public/merchant.txt.gz", "merchant.txt.gz")
+download.to.file("https://s3-eu-west-1.amazonaws.com/intuitics-public/romeo.txt.gz", "romeo.txt.gz")
+download.to.file("https://s3-eu-west-1.amazonaws.com/intuitics-public/summer.txt.gz", "summer.txt.gz")
 
 # Map the name of each work to its file
 books <- list("A Mid Summer Night's Dream" = "summer",
